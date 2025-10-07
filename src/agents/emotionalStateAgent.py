@@ -14,7 +14,7 @@ class Classification(BaseModel):
     )
 
 class EmotionalStateAgent:
-    def __init__(self,prompt):
+    def __init__(self):
         self.prompt_template = ChatPromptTemplate.from_template(
                 """
             Extract the desired information from the following passage.
@@ -27,7 +27,10 @@ class EmotionalStateAgent:
         model=get_google_genai()
         self.model = model.with_structured_output(Classification)
 
-# TODO
+    def classify_emotion(self, text: str) -> int:
+        prompt = self.prompt_template.invoke({"input": text})
+        response = self.model.invoke(prompt)
+        return response
 
 
         
