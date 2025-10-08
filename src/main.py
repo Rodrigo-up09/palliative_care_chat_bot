@@ -1,6 +1,7 @@
 from agents.chatBotAgent import ChatBotAgent
 from agents.emotionalStateAgent import EmotionalStateAgent
-
+from agents.promptImproverAgent import PromptImproverAgent
+from agents.summarizeAgent import SummarizeAgent
 def testChatBot():
     agent = ChatBotAgent("data/clinic_cases.csv")  # Caminho para o CSV
     user_id = 1
@@ -29,16 +30,11 @@ def testChatBot():
 def testEmotionBot():
     agent = EmotionalStateAgent()
     test_cases = [
-        "Sinto-me muito em baixo, a saúde da minha mãe piorou.",
-        "Estou um pouco preocupado com a situação, mas acho que vai correr tudo bem.",
-        "Estou preocupado com a dor que a minha mãe está a sentir.",
-        "Porque é que nada parece funcionar direito aqui?",
-        "Bom dia, gostaria de saber o estado clínico da minha mãe.",
-        "Estou um pouco preocupado, a minha mãe não tem comido bem.",
-        "Ela parece pior hoje, mas talvez seja só cansaço.",
-        "Já não sei o que fazer, isto tem sido muito difícil."
-
-
+        "Já não sei se o que estão a fazer é ajudar ou só prolongar o sofrimento… não quero ser injusto, mas dói tanto ver isto.",
+        "Ela estava melhor ontem e agora dizem que é o fim? Como é que se entende isto? Não faz sentido nenhum.",
+        "Disseram-me que iam mudar o tratamento, mas ninguém me disse porquê… é bom ou mau?",
+        "Ela já não come, mas dizem que é normal. Normal como? Para quem?",
+        "Não sei se é amor ou egoísmo o que sinto, quero que ele fique mas também quero que acabe.",
     ]
     
     for i, inp in enumerate(test_cases, 1):
@@ -47,6 +43,52 @@ def testEmotionBot():
         print(f"→ Emoção classificada: {response}\n")
 
 
+def testPromptImprover():
+     #testChatBot()
+    user_prompts = [
+   
+    "Não aguento mais ver a minha mãe assim, todos os dias piora e eu não sei o que fazer...",
+
+    "O que posso fazer para aliviar a dor do meu pai em casa?",
+   
+
+    "A minha mãe não quer continuar o tratamento, devo respeitar a decisão dela?",
+ 
+
+    "Sinto-me sozinho, ninguém parece compreender o que estou a passar.",
+   
+  
+    "A médica disse que talvez seja melhor parar o tratamento, mas não percebi bem o que isso implica.",
+
+  
+    "Existem grupos de apoio para familiares de doentes em cuidados paliativos?",
+    
+]
+    agent = PromptImproverAgent()
+    for i, prompt in enumerate(user_prompts, 1):
+        improved = agent.improve_prompt(prompt)
+        print(f"Teste {i}:")
+        print(f"Prompt original: {prompt}")
+        print(f"Prompt melhorado: {improved}\n")
+
+ 
+
+
+
+async def testSummary():
+    agent = SummarizeAgent(urlPath="https://www.sns.gov.pt/sns/cuidados-paliativos/", isUrl=True)
+    splitDoc = agent.loadContent()
+    # Filter out empty documents
+    splitDoc = [doc for doc in splitDoc if doc.page_content.strip()]
+    app = agent.build_workflow()
+    async for step in app.astream(
+        
+        {"contents": [doc.page_content for doc in splitDoc]},
+        {"recursion_limit": 10},
+    ):
+         print(list(step.keys()))
+        
+import asyncio
+
 if __name__ == "__main__":
-    #testChatBot()
-    testEmotionBot()
+    asyncio.run(testSummary())

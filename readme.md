@@ -9,6 +9,16 @@
 - ## Prompt Improver Agent
   This agent is responsible for improving the user’s prompt to ensure that the input is clear, concise, and free of redundant information. Its goal is to make the queries more consistent so that the chatbot can generate better responses.
 
+  ### Results:
+
+  | **Teste** | **Prompt Original** | **Prompt Melhorado** | **Observações** |
+  |:----------:|---------------------|-----------------------|-----------------|
+  | **1** | Não aguento mais ver a minha mãe assim, todos os dias piora e eu não sei o que fazer... | Minha mãe está piorando a cada dia e eu me sinto exausto(a) e sem saber como agir. Poderia me oferecer orientação ou apoio sobre como lidar com a situação dela e com minhas próprias emoções neste momento difícil? | Excelente reformulação — remove redundância, clarifica intenção e preserva empatia. |
+  | **2** | O que posso fazer para aliviar a dor do meu pai em casa? | O que posso fazer para aliviar a dor do meu pai em casa? | Sem alterações — o prompt já era claro e objetivo.  |
+  | **3** | A minha mãe não quer continuar o tratamento, devo respeitar a decisão dela? | Minha mãe não deseja continuar o tratamento. Devo respeitar a decisão dela? | Reformulação leve, apenas ajusta estilo e fluidez da linguagem. |
+  | **4** | Sinto-me sozinho, ninguém parece compreender o que estou a passar. | Estou a sentir-me muito sozinho e incompreendido. | Simplifica a frase, mantém emoção essencial. Boa síntese. |
+  | **5** | A médica disse que talvez seja melhor parar o tratamento, mas não percebi bem o que isso implica. | Preciso entender as implicações de interromper o tratamento, conforme a recomendação médica. | Reformulação clara e concisa — transforma confusão em pedido direto por compreensão. |
+
 - ## Emotion Interpreter Agent
 
   ### Purpose
