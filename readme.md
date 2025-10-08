@@ -56,10 +56,30 @@
 
   ---
 
-- **Knowledge Agent**  
-  This agent summarizes and indexes all background information, providing a **scientific and evidence-based foundation** for the chatbot. It organizes:  
-  - Generic palliative care knowledge  
-  - Patient-specific information
+- ## Summarize Agent
+  - Not used in the MVP
+
+  **Summarize Agent**  
+  This agent is responsible for **summarizing and condensing multiple sources of information** into clear, concise summaries. It provides a **scientific and structured foundation** for downstream agents in the chatbot workflow. Key features include:
+
+  - Aggregates and condenses content from multiple documents or web sources.
+  - Uses a **map-reduce approach** to handle large amounts of information efficiently.
+  - Generates intermediate summaries and a final consolidated summary.
+  - Ensures that the summaries stay **faithful to the original content** and do not invent information.
+  - Can be configured to summarize content from URLs, defaulting to trusted palliative care sources if no URL is provided.
+  - Integrates seamlessly with the overall chatbot architecture, supporting patient-specific and general knowledge aggregation.
+
+- ## InfoFetcher Agent
+
+  **InfoFetcher Agent**  
+  This agent is responsible for **retrieving the most relevant information** to answer user queries. It provides a **document-based evidence layer** for the chatbot, ensuring responses are grounded in available knowledge. Key features include:
+
+  - Stores documents in a **vector database** using embeddings.
+  - Performs **similarity search** to find the most relevant content for a given query.
+  - Supports dynamic addition of new documents at runtime.
+  - Ensures that the chatbot can base its answers on **retrieved, contextually relevant sources**, rather than guessing.
+  - Integrates with the summarization and chat agents to provide **theoretical context** for responses.
+
 
 - ## ChatBot Agent
   This agent receives the improved prompt, the emotional context, and the relevant knowledge from the Knowledge Agent to generate **precise and helpful responses**, adapting to the user’s emotional and situational context.
@@ -85,10 +105,70 @@
       ),
       MessagesPlaceholder(variable_name="messages"),
       ])
-```
+  ```
+
+
+
+## Chatbot Orchestrator Workflow
+
+**Chatbot Orchestrator**  
+This orchestrator coordinates all the agents involved in the palliative care chatbot, providing a **seamless workflow** from user input to response generation. The workflow is as follows:
+
+1. **User Input**
+   - The family member or caregiver inputs a question or concern about the patient.
+
+2. **Patient Context Retrieval**
+   - The orchestrator fetches full patient information from the database (`DataUtils`) based on `user_id`.
+
+3. **Prompt Improvement**
+   - The `PromptImproverAgent` refines the user's raw input, integrating patient-specific context for a more precise query.
+
+4. **Emotion Classification**
+   - The `EmotionalStateAgent` analyzes the user input to determine the emotional context (stress/anxiety level).
+
+5. **Document Retrieval**
+   - The `InfoFetcherAgent` adds theoretical context documents and retrieves the **most relevant documents** based on the improved prompt.
+
+6. **Response Generation**
+   - The `ChatBotAgent` generates a response using:
+     - The improved prompt
+     - Retrieved documents
+     - Emotional context
+     - Patient-specific information
+
+7. **Output**
+   - The chatbot outputs a **contextual, evidence-based, and emotionally adjusted response** to the user.
+
+8. **Interactive Loop**
+   - The `chat_loop` method continues to process inputs until the user types "sair"/"exit"/"quit", allowing a real-time conversational simulation.
+
+**Note:**  
+This orchestrator ensures that the chatbot remains **scientifically grounded**, adapts to **user emotions**, and integrates **patient-specific details** to provide practical and empathetic guidance in palliative care scenarios.
+
+
 ![Diagrama](images/agentDiagramV1.png)
 
+### Additional Agents (Future Work)
 
-### Adition agents (future work)
 - **Feedback Agent**  
-  This agent is responsible for **evaluating the chatbot’s output**. It checks whether the generated response is appropriate, accurate, and helpful, providing feedback to improve or refine the final output if necessary.
+  Responsible for **evaluating the chatbot’s output**. It would check if the generated response is appropriate, accurate, and helpful, providing feedback to improve or refine the final output when necessary.
+
+- **Message Pruning**  
+  Messages are currently stored in the `ChatBotAgent`, which could lead to buffer overflow over time. Implementing an algorithm to prune messages while preserving important information is needed.
+
+- **Summarized Agent**  
+  Although a summarization agent is implemented, it is currently unused. Since this project does not work with a large information source, it was not necessary. However, a workflow connecting `InfoFetcherAgent` and the `SummarizeAgent` could improve performance for larger datasets.
+
+- **RailGuard Agent**  
+  Intended to **keep the chatbot within context** and protect it from potential external attacks or malicious input.
+
+- **Database Integration**  
+  The current system uses a simple CSV file for storing patient information. For scalability, a proper database solution should be implemented.
+
+## Notes
+
+- This project is a **prototype**. The knowledge base of the model is minimal, relying only on a random webpage about palliative care.
+- The **search results are basic** since they rely on a simple similarity search and should be improved for better accuracy.
+- Prompts are based on **ChatGPT-style instructions** because this project is not created by a palliative care specialist—just someone interested in agents and AI.
+- There is **no frontend**, which makes it less interactive and harder to visualize the workflow.
+- **Important:** This is a conceptual prototype. The basic workflow is established, but the results are preliminary and should not be used in real clinical settings.

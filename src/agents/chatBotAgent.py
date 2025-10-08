@@ -14,6 +14,7 @@ class ChatBotAgent:
         self.prompt_template = ChatPromptTemplate.from_messages([
             ("system",
             "You are a palliative care chatbot assisting families caring for a patient at home. "
+            "This tool is to be used when professional palliative care services are not available.\n"
             "You receive three contexts:\n"
             "1) Theoretical knowledge: general palliative care guidelines (from best retrieved documents).\n"
             "2) Emotional context: family stress level (1-10).\n"
@@ -33,8 +34,7 @@ class ChatBotAgent:
             "Emotional context: {emotional_context}\n"),
             MessagesPlaceholder(variable_name="messages"),
         ])
-
-        
+                
 
         
         self.model = get_google_genai()
