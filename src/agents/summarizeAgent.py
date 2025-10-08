@@ -12,6 +12,8 @@ from langgraph.constants import Send
 from langgraph.graph import END, START, StateGraph
 from langchain.document_loaders import PyPDFLoader
 from langchain.text_splitter import CharacterTextSplitter
+from langchain_core.messages import HumanMessage
+
 # method used Map-reduce
 # source https://python.langchain.com/docs/tutorials/summarization/
 class SummarizeAgent:
@@ -24,18 +26,7 @@ class SummarizeAgent:
 
         self.urlPath=urlPath
         self.isUrl=isUrl
-
-        self.map_prompt  = ChatPromptTemplate.from_messages(
         
-        [("system", "Write a concise summary of the following:\\n\\n{context}")])
-        
-        reduce_template = """
-                The following is a set of summaries:
-                {docs}
-                Take these and distill it into a final, consolidated summary
-                of the main themes.
-            """
-        self.reduce_prompt = ChatPromptTemplate.from_messages([("human", reduce_template)])
 
 
 
@@ -44,10 +35,12 @@ class SummarizeAgent:
         return sum(self.model.get_num_tokens(doc.page_content) for doc in documents)
 
     async def generate_summary(self, state: SummaryState):
-        prompt_value = self.map_prompt.format_prompt(context=state["content"])
-        response = await self.model.ainvoke(prompt_value.to_messages())
-        return {"summaries": [response.content]}
-    
+        # Cria prompt para resumir o conteúdo original
+        message = HumanMessage(content=f"Write a concise summary of the following:\n\n{state['content']}")
+        response = await self.model.ainvoke([message])
+        print(f"[DEBUG] Summary response length: {len(response.content)}")
+        return {"summaries": [response.content]}  # devolve num dicionário
+
     def map_summaries(self,state: OverallState):
         # We will return a list of `Send` objects
         # Each `Send` object consists of the name of a node in the graph
@@ -61,10 +54,25 @@ class SummarizeAgent:
             "collapsed_summaries": [Document(summary) for summary in state["summaries"]]
         }
     
-    async def _reduce(self, input: dict) -> str:
-        prompt = self.reduce_prompt.invoke({"docs": input})  
-        response = await self.model.ainvoke(prompt)
+    async def _reduce(self, input: list) -> str:
+        # Garante que estamos a juntar o conteúdo textual de cada documento
+        summaries_text = "\n\n".join(
+            doc.page_content if isinstance(doc, Document) else str(doc)
+            for doc in input
+        )
+
+        message = HumanMessage(
+            content=(
+                "Take the following summaries and distill them into a final, "
+                "consolidated summary of the main themes:\n\n"
+                f"{summaries_text}"
+            )
+        )
+
+        response = await self.model.ainvoke([message])
+        print(f"[DEBUG] Reduce response length: {len(response.content)}")
         return response.content
+
     
     async def collapse_summaries(self,state: OverallState):
         doc_lists = split_list_of_docs(

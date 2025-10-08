@@ -1,7 +1,7 @@
 from agents.chatBotAgent import ChatBotAgent
 from agents.emotionalStateAgent import EmotionalStateAgent
 from agents.promptImproverAgent import PromptImproverAgent
-from agents.summarizeAgent import SummarizeAgentRefine
+from agents.summarizeAgent import SummarizeAgent
 def testChatBot():
     agent = ChatBotAgent("data/clinic_cases.csv")  # Caminho para o CSV
     user_id = 1
@@ -74,3 +74,25 @@ def testPromptImprover():
  
 
 
+
+async def testSummary():
+    agent = SummarizeAgent(urlPath="https://www.sns.gov.pt/sns/cuidados-paliativos/", isUrl=True)
+    splitDoc = agent.loadContent()
+
+    print(f"[DEBUG] Total chunks ready for summarization: {len(splitDoc)}")
+    
+    app = agent.build_workflow()
+    async for step in app.astream(
+        {"contents": [doc.page_content for doc in splitDoc]},
+        {"recursion_limit": 10},
+    ):
+        print(f"[DEBUG] Step keys: {list(step.keys())}")
+        # Opcional: mostrar primeiro resumo de cada step
+        if 'summaries' in step:
+            print(f"[DEBUG] First summary snippet:\n{step['summaries'][0][:200]}")
+
+        
+import asyncio
+
+if __name__ == "__main__":
+    asyncio.run(testSummary())
