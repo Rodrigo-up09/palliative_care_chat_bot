@@ -1,7 +1,7 @@
 from agents.chatBotAgent import ChatBotAgent
 from agents.emotionalStateAgent import EmotionalStateAgent
 from agents.promptImproverAgent import PromptImproverAgent
-from agents.summarizeAgent import SummarizeAgent
+from agents.summarizeAgent import SummarizeAgentRefine
 def testChatBot():
     agent = ChatBotAgent("data/clinic_cases.csv")  # Caminho para o CSV
     user_id = 1
@@ -69,26 +69,8 @@ def testPromptImprover():
         improved = agent.improve_prompt(prompt)
         print(f"Teste {i}:")
         print(f"Prompt original: {prompt}")
-        print(f"Prompt melhorado: {improved}\n")
+        print(f"Prompt   melhorado: {improved}\n")
 
  
 
 
-
-async def testSummary():
-    agent = SummarizeAgent(urlPath="https://www.sns.gov.pt/sns/cuidados-paliativos/", isUrl=True)
-    splitDoc = agent.loadContent()
-    # Filter out empty documents
-    splitDoc = [doc for doc in splitDoc if doc.page_content.strip()]
-    app = agent.build_workflow()
-    async for step in app.astream(
-        
-        {"contents": [doc.page_content for doc in splitDoc]},
-        {"recursion_limit": 10},
-    ):
-         print(list(step.keys()))
-        
-import asyncio
-
-if __name__ == "__main__":
-    asyncio.run(testSummary())

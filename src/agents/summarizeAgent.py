@@ -1,7 +1,6 @@
 from models.llm_factory import get_google_genai
 from langchain.prompts.chat import ChatPromptTemplate
 from langchain_community.document_loaders import WebBaseLoader
-from langchain_core.prompts import ChatPromptTemplate
 from typing import  List,Literal
 from memory.summaryStates import OverallState, SummaryState
 from langchain.chains.combine_documents.reduce import (
@@ -36,23 +35,19 @@ class SummarizeAgent:
                 Take these and distill it into a final, consolidated summary
                 of the main themes.
             """
-        self.reduce_prompt = reduce_prompt = ChatPromptTemplate([("human", reduce_template)])
+        self.reduce_prompt = ChatPromptTemplate.from_messages([("human", reduce_template)])
+
+
 
     def length_function(self,documents: List[Document]) -> int:
         """Get number of tokens for input contents."""
         return sum(self.model.get_num_tokens(doc.page_content) for doc in documents)
 
     async def generate_summary(self, state: SummaryState):
-        
-        if not state.get("content"):
-            raise ValueError("state['content'] não está definido ou está vazio")
-        
-      
-        prompt = self.map_prompt.invoke({"context": state["content"]})
-        response = await self.model.ainvoke(prompt)
+        prompt_value = self.map_prompt.format_prompt(context=state["content"])
+        response = await self.model.ainvoke(prompt_value.to_messages())
         return {"summaries": [response.content]}
-
-
+    
     def map_summaries(self,state: OverallState):
         # We will return a list of `Send` objects
         # Each `Send` object consists of the name of a node in the graph
@@ -65,8 +60,9 @@ class SummarizeAgent:
         return {
             "collapsed_summaries": [Document(summary) for summary in state["summaries"]]
         }
-    async def _reduce(self,input: dict) -> str:
-        prompt = self.reduce_prompt.invoke(input)
+    
+    async def _reduce(self, input: dict) -> str:
+        prompt = self.reduce_prompt.invoke({"docs": input})  
         response = await self.model.ainvoke(prompt)
         return response.content
     
@@ -81,6 +77,7 @@ class SummarizeAgent:
         return {"collapsed_summaries": results}
         # This represents a conditional edge in the graph that determines
     # if we should collapse the summaries or not
+
     def should_collapse(self,
         state: OverallState,
     ) -> Literal["collapse_summaries", "generate_final_summary"]:
@@ -126,4 +123,3 @@ class SummarizeAgent:
         split_docs = text_splitter.split_documents(docs)
         return split_docs
 
-# TODO
