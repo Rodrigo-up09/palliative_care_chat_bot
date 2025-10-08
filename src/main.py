@@ -1,7 +1,9 @@
 from agents.chatBotAgent import ChatBotAgent
 from agents.emotionalStateAgent import EmotionalStateAgent
+from agents.infoFetcher import InfoFetcherAgent
 from agents.promptImproverAgent import PromptImproverAgent
 from agents.summarizeAgent import SummarizeAgent
+from utils.docs_utils import split_documentForEmbedding
 def testChatBot():
     agent = ChatBotAgent("data/clinic_cases.csv")  # Caminho para o CSV
     user_id = 1
@@ -92,7 +94,33 @@ async def testSummary():
             print(f"[DEBUG] First summary snippet:\n{step['summaries'][0][:200]}")
 
         
-import asyncio
+def testInfoFetcher():
+    agent = InfoFetcherAgent()
+
+    # Carregar e dividir documentos
+    docs = split_documentForEmbedding(
+        "https://www.sns.gov.pt/sns/cuidados-paliativos/", isUrl=True
+    )
+    print(f"Loaded {len(docs)} chunks")
+
+    agent.add_documents(docs)
+    print("Documents added to vector store")
+
+    # Consulta
+    query = "O que são cuidados paliativos?"
+    results = agent.retrieve(query, top_k=3)
+
+    if results:
+        for i, doc in enumerate(results):
+            print(f"\nResult {i+1}:\n{doc.page_content[:500]}...\n")
+    else:
+        print("Nenhum resultado encontrado")
+
 
 if __name__ == "__main__":
-    asyncio.run(testSummary())
+    #testChatBot()
+    #testEmotionBot()
+    #testPromptImprover()
+    #import asyncio
+    #asyncio.run(testSummary())
+    testInfoFetcher()

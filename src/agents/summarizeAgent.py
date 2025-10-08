@@ -1,6 +1,5 @@
 from models.llm_factory import get_google_genai
 from langchain.prompts.chat import ChatPromptTemplate
-from langchain_community.document_loaders import WebBaseLoader
 from typing import  List,Literal
 from memory.summaryStates import OverallState, SummaryState
 from langchain.chains.combine_documents.reduce import (
@@ -10,8 +9,6 @@ from langchain.chains.combine_documents.reduce import (
 from langchain_core.documents import Document
 from langgraph.constants import Send
 from langgraph.graph import END, START, StateGraph
-from langchain.document_loaders import PyPDFLoader
-from langchain.text_splitter import CharacterTextSplitter
 from langchain_core.messages import HumanMessage
 
 # method used Map-reduce
@@ -117,17 +114,5 @@ class SummarizeAgent:
         app = graph.compile()
         return app
 
-    def loadContent(self):
-        if self.isUrl:
-            loader = WebBaseLoader(self.urlPath)
-            docs = loader.load()
-            
-        else:
-            loader = PyPDFLoader(self.urlPath)
-            docs = loader.load()
-        text_splitter = CharacterTextSplitter.from_tiktoken_encoder(
-            chunk_size=1000, chunk_overlap=0
-        )
-        split_docs = text_splitter.split_documents(docs)
-        return split_docs
+    
 

@@ -1,5 +1,6 @@
 from langchain.chat_models import init_chat_model
 from dotenv import load_dotenv
+from langchain_google_genai import GoogleGenerativeAIEmbeddings
 
 
 load_dotenv()
@@ -25,3 +26,9 @@ def get_google_genai_alt(model_name="gemini-2.5-flash", temperature=0.3):
         model_kwargs={"convert_system_message_to_human": True}
     )
     return model
+
+
+def get_google_genai_embedding():
+    embeddings = GoogleGenerativeAIEmbeddings(model="models/gemini-embedding-001")
+    return embeddings
+
