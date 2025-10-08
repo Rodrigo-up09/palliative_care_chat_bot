@@ -4,6 +4,8 @@ from agents.infoFetcher import InfoFetcherAgent
 from agents.promptImproverAgent import PromptImproverAgent
 from agents.summarizeAgent import SummarizeAgent
 from utils.docs_utils import split_documentForEmbedding
+from utils.data_utils import DataUtils
+from orchestrator.chatBotOrchestrator import ChatbotOrchestrator
 def testChatBot():
     agent = ChatBotAgent("data/clinic_cases.csv")  # Caminho para o CSV
     user_id = 1
@@ -45,35 +47,46 @@ def testEmotionBot():
         print(f"→ Emoção classificada: {response}\n")
 
 
-def testPromptImprover():
-     #testChatBot()
-    user_prompts = [
-   
-    "Não aguento mais ver a minha mãe assim, todos os dias piora e eu não sei o que fazer...",
-
-    "O que posso fazer para aliviar a dor do meu pai em casa?",
-   
-
-    "A minha mãe não quer continuar o tratamento, devo respeitar a decisão dela?",
- 
-
-    "Sinto-me sozinho, ninguém parece compreender o que estou a passar.",
-   
-  
-    "A médica disse que talvez seja melhor parar o tratamento, mas não percebi bem o que isso implica.",
-
-  
-    "Existem grupos de apoio para familiares de doentes em cuidados paliativos?",
-    
+def test_prompt_improver():
+    agent=PromptImproverAgent()
+    data=DataUtils("data/clinic_cases.csv")
+    tests = [
+    {
+        "user_id": 1,
+        "user_input": "Estou com dificuldades em alimentar a minha mãe.",
+    },
+    {
+        "user_id": 2,
+        "user_input": "Como posso ajudar minha mãe a lidar com dor intensa e alterações físicas?",
+    },
+    {
+        "user_id": 3,
+        "user_input": "Preciso de orientação para cuidados com a minha avó com PEG.",
+    },
+    {
+        "user_id": 4,
+        "user_input": "Meu pai está muito ansioso e não consegue dormir à noite. O que devo fazer?",
+    }
 ]
-    agent = PromptImproverAgent()
-    for i, prompt in enumerate(user_prompts, 1):
-        improved = agent.improve_prompt(prompt)
-        print(f"Teste {i}:")
-        print(f"Prompt original: {prompt}")
-        print(f"Prompt   melhorado: {improved}\n")
 
- 
+    for test in tests:
+        context = data.get_full_patient_info(test["user_id"])
+        if context is None:
+            print(f"Sem contexto para user_id {test['user_id']}")
+            continue
+
+        improved_prompt = agent.improve_prompt(
+            text=test["user_input"],
+            context={
+                "name": context.get("patient_name"),
+                "diseases": context.get("patient_diseases"),
+                "description": context.get("patient_description")}
+        )
+
+        print(f"=== Test {test['user_id']} ===")
+        print(f"Input: {test['user_input']}")
+        print(f"Improved Prompt: {improved_prompt.content}\n")
+
 
 
 
@@ -117,10 +130,12 @@ def testInfoFetcher():
         print("Nenhum resultado encontrado")
 
 
+import asyncio
+
 if __name__ == "__main__":
-    #testChatBot()
-    #testEmotionBot()
-    #testPromptImprover()
-    #import asyncio
-    #asyncio.run(testSummary())
-    testInfoFetcher()
+    url = "https://www.msdmanuals.com/pt/casa/fundamentos/morte-e-sofrimento/sintomas-durante-uma-doen%C3%A7a-fatal"
+    docs = split_documentForEmbedding(url, isUrl=True)
+    bot = ChatbotOrchestrator("data/clinic_cases.csv")
+    
+    # Executa a coroutine de forma correta
+    asyncio.run(bot.chat_loop(user_id="5", theoretical_context=docs))

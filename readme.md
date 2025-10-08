@@ -11,13 +11,12 @@
 
   ### Results:
 
-  | **Teste** | **Prompt Original** | **Prompt Melhorado** | **Observações** |
-  |:----------:|---------------------|-----------------------|-----------------|
-  | **1** | Não aguento mais ver a minha mãe assim, todos os dias piora e eu não sei o que fazer... | Minha mãe está piorando a cada dia e eu me sinto exausto(a) e sem saber como agir. Poderia me oferecer orientação ou apoio sobre como lidar com a situação dela e com minhas próprias emoções neste momento difícil? | Excelente reformulação — remove redundância, clarifica intenção e preserva empatia. |
-  | **2** | O que posso fazer para aliviar a dor do meu pai em casa? | O que posso fazer para aliviar a dor do meu pai em casa? | Sem alterações — o prompt já era claro e objetivo.  |
-  | **3** | A minha mãe não quer continuar o tratamento, devo respeitar a decisão dela? | Minha mãe não deseja continuar o tratamento. Devo respeitar a decisão dela? | Reformulação leve, apenas ajusta estilo e fluidez da linguagem. |
-  | **4** | Sinto-me sozinho, ninguém parece compreender o que estou a passar. | Estou a sentir-me muito sozinho e incompreendido. | Simplifica a frase, mantém emoção essencial. Boa síntese. |
-  | **5** | A médica disse que talvez seja melhor parar o tratamento, mas não percebi bem o que isso implica. | Preciso entender as implicações de interromper o tratamento, conforme a recomendação médica. | Reformulação clara e concisa — transforma confusão em pedido direto por compreensão. |
+  | Test | Input | Improved Prompt |
+  |------|-------|----------------|
+  | 1 | Estou com dificuldades em alimentar a minha mãe. | Estou com dificuldades em alimentar a minha mãe, D. Antónia, de 82 anos. Ela tem uma PEG para alimentação devido à maxilectomia e traqueostomia recentes, e está muito assustada com a sua nova condição clínica. Como posso gerir melhor o processo de alimentação, considerando estas dificuldades e o seu estado emocional? |
+  | 2 | Como posso ajudar minha mãe a lidar com dor intensa e alterações físicas? | Como posso, como filha(o), auxiliar minha mãe, Joana, a gerir a dor intensa das suas cefaleias e as alterações físicas decorrentes do glioblastoma, como as alterações sensoriais na hemiface direita, zumbidos e visão dupla, que a afetam diariamente e contribuem para o seu medo e ansiedade? |
+  | 3 | Preciso de orientação para cuidados com a minha avó com PEG. | Como neta de D. Antónia, a minha avó de 82 anos que tem uma sonda PEG desde outubro, preciso de orientação prática sobre os cuidados diários. Ela está cognitivamente íntegra, mas muito assustada com a sua nova condição. Gostaria de saber como gerir a higiene da PEG, a administração segura de alimentação e medicação, e como posso apoiá-la emocionalmente para lidar com o desconforto e o medo. |
+  | 4 | Meu pai está muito ansioso e não consegue dormir à noite. O que devo fazer? | Meu pai, Sr. Nuno, de 76 anos, que sofre de carcinoma de pequenas células do pulmão estadio IV, metástase cerebral provável e óssea, e que se encontra com degradação do estado geral, dependente no autocuidado e caquexia, está muito ansioso e não consegue dormir à noite. Atualmente a receber Imipenem e Vancomicina devido a sépsis, o que devo fazer para o ajudar com a ansiedade e a insónia? |
 
 - ## Emotion Interpreter Agent
 
